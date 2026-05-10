@@ -45,7 +45,7 @@ app.use("*", async (c, next) => {
     await next();
     const latency = performance.now() - start;
     incrementMetrics(latency);
-    trackRequestEnd(connId, c.res.status, latency);
+    trackRequestEnd(connId, c.res.status);
 });
 
 registerEndpoints(app);
