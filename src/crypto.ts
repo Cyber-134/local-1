@@ -1,5 +1,4 @@
-// ─── URL Encryption (XOR + base64url) ───────
-
+// ─── URL Encryption (XOR + base64url) ────────────────────────────────────────
 export const XOR_KEY = (() => {
     const key = process.env.XOR_KEY ?? "";
     if (!key) {
@@ -10,12 +9,9 @@ export const XOR_KEY = (() => {
     return key;
 })();
 
-
 function bytesToBinaryString(bytes: Uint8Array): string {
-    
     return new TextDecoder("latin1").decode(bytes);
 }
-
 
 function binaryStringToBytes(binary: string): Uint8Array {
     const len = binary.length;
@@ -26,13 +22,11 @@ function binaryStringToBytes(binary: string): Uint8Array {
     return bytes;
 }
 
-
 export function encryptUrl(url: string): string {
     const data = new TextEncoder().encode(url);
     const key = new TextEncoder().encode(XOR_KEY);
 
-    
-    if (key.length === 0)
+    if (key.length === 0) {
         return btoa(bytesToBinaryString(data))
             .replace(/\+/g, "-")
             .replace(/\//g, "_")
@@ -53,19 +47,13 @@ export function encryptUrl(url: string): string {
         .replace(/=+$/, "");
 }
 
-/**
- * Decrypt a token back to the original URL.
- * Returns `null` if the token is malformed or decryption fails.
- */
 export function decryptUrl(encrypted: string): string | null {
     try {
-        // Convert base64url → base64
         const b64 = encrypted.replace(/-/g, "+").replace(/_/g, "/");
-        const raw = atob(b64); // binary string, each char code in 0-255
+        const raw = atob(b64);
         const bytes = binaryStringToBytes(raw);
         const key = new TextEncoder().encode(XOR_KEY);
 
-        // Empty key → just decode the UTF‑8 without XOR
         if (key.length === 0) {
             return new TextDecoder().decode(bytes);
         }
